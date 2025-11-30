@@ -1,0 +1,96 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "da",
+						"type": "address"
+					}
+				],
+				"name": "D",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "o",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "owners",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"print_mint.sol": "P"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"print_mint.sol": {
+			"keccak256": "0x2f004a65121573108d6677604664423363c1ba16683d61eba523a5fce1f192c0",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://bcdc841c7b59c1609723123bc361b2614dacb7dec8ad91279bad7ebfb33440af",
+				"dweb:/ipfs/QmSQqXRJB1ugPVdUppGehu1rPhCmbArZEoKdUrkboXDe65"
+			]
+		}
+	},
+	"version": 1
+}
