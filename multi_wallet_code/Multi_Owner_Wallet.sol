@@ -1,43 +1,49 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+/// @dev Only owner can start a withdrawal
 contract MultiOwnerWallet {
+    address[] public owners; // list of multisig wallet owners
+    mapping(address => bool) public isOwner;
 
-    address[] public owners;                 
-    mapping(address => bool) public isOwner; 
+    uint256 public withdrawalAmount;
 
-    uint256 public withdrawalAmount;         
-    address public withdrawalTo;             
-    bool public withdrawalRequested;         
+    uint32 public approvalThreshold;
+    uint32 public approvalCount;
 
-    mapping(address => bool) public approval; 
-    uint256 public approvalCount;            
+    address public withdrawalTo;
+    bool public withdrawalRequested;
 
-   
-     constructor(address[] memory _owners) {
+    mapping(uint256 => mapping(address => bool)) public approvals;
+    uint256 public withdrawalId;
+
+    constructor(address[] memory _owners, uint32 _approvalThreshold) {
         require(_owners.length > 0, "Need at least 1 owner");
+        require(_approvalThreshold > 0, "Need at least 1 approval");
+        require(_approvalThreshold <= _owners.length, "Approval threshold too high");
 
         for (uint256 i = 0; i < _owners.length; i++) {
             address owner = _owners[i];
-            require(owner != address(0), "Invalid owner");
-            require(!isOwner[owner], "Duplicate owner");
-
+            require(owner != address(0), "Invalid owner"); // It s forbidden for one of the owners to be the zero address
+            require(!isOwner[owner], "Duplicate owner"); // Its forbidden to have duplicate owners
             owners.push(owner);
             isOwner[owner] = true;
         }
+
+        approvalThreshold = _approvalThreshold;
     }
 
+    /// @notice Modifier to check if the caller one of the owners
     modifier onlyOwner() {
         require(isOwner[msg.sender], "Not an owner");
         _;
     }
 
-    function deposit() external payable onlyOwner {}
+    /// @notice Function to deposit funds to wallet
+    function deposit() external payable {} // We let everyone deposit funds to wallet
 
-    function requestWithdrawal(uint256 amount, address to)
-        external
-        onlyOwner
-    {
+    /// @notice Function to request withdrawal
+    function requestWithdrawal(uint256 amount, address to) external onlyOwner {
         require(!withdrawalRequested, "Already requested");
         require(address(this).balance >= amount, "Not enough funds");
 
@@ -45,22 +51,20 @@ contract MultiOwnerWallet {
         withdrawalTo = to;
         withdrawalRequested = true;
 
-        for (uint256 i = 0; i < owners.length; i++) {
-            approval[owners[i]] = false;
-        }
+        withdrawalId++;
         approvalCount = 0;
     }
 
-   
+    /// @notice Function to approve withdrawal
     function approveWithdrawal() external onlyOwner {
         require(withdrawalRequested, "No withdrawal requested");
-        require(!approval[msg.sender], "Already approved");
+        require(!approvals[withdrawalId][msg.sender], "Already approved");
 
-        approval[msg.sender] = true;
+        approvals[withdrawalId][msg.sender] = true;
         approvalCount++;
 
-        if (approvalCount == owners.length) {
-            payable(withdrawalTo).transfer(withdrawalAmount);
+        if (approvalCount >= approvalThreshold) {
+            payable(withdrawalTo).call{value: withdrawalAmount}(""); // Using safemethods for transfers
 
             withdrawalRequested = false;
             withdrawalAmount = 0;
@@ -68,13 +72,14 @@ contract MultiOwnerWallet {
         }
     }
 
+    /// @notice Returns the balance of the multisigwallet
     function getBalance() external view returns (uint256) {
         return address(this).balance;
     }
 
+    /// @notice Returns the list of owners
     function getOwners() external view returns (address[] memory) {
-    return owners;
-}
-
+        return owners;
+    }
 }
 
